@@ -1,0 +1,346 @@
+<!doctype html>
+<head>
+
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} IGO {% endblock %}</title>
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+ 
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type ="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+
+
+
+</head>
+<body>
+
+  {%block loader%}
+<div class ="loading" id="loading">
+  <img id="jumbotron loading-image" src="static/images/loading.gif" alt="Loading..." style="margin-left:40%;margin-top:20%;width:20%; height:20%; background:black;opacity:1.0;"/>
+</div>
+{%endblock%}
+<nav class="navbar navbar-inverse">
+
+  {%block navbar%}
+
+  <div class="container-fluid">
+
+    <div class="navbar-header">
+      <a class="navbar-brand" href="{{url_for('hello_world')}}">IGO</a>
+    </div>
+
+  </div>
+  {%endblock%}
+</nav>
+
+
+<div class="container content" style="width: 100%; ">
+  {% block formcontent %}
+
+  <h2 style="margin-left:40%; margin-bottom:40px;align-content: center;">Library preparation data</h2>
+
+  <form class="form-inline" action = "/upload_file" method = "POST" enctype = "multipart/form-data">
+
+    <div class = "col col-md-12" style="maximum-width:60%; margin-left:25%;align-content: center; ">
+      <label for="startDate">Start Date:</label> <input placeholder="mm/yyyy" class="form-control" type="text" name="startDate" id="startDate" date-date-format="mm/yyyy"/>
+      <label for="endDate">End Date:</label> <input placeholder="mm/yyyy" class="form-control" type="text" name="endDate" id="endDate" date-date-format="mm/yyyy"/>
+      <label for="Recipe">Recipe:</label>
+      <select class="form-control" name="recipe" id="Recipe">
+        <option>All</option>
+
+        {%for item in data['recipeList']%}
+
+        <option>{{item}}</option>
+
+        {%endfor%}
+
+
+      </select>
+        <div class = "form-group">
+          <input class = "btn btn-primary" type=submit value=Submit>
+        </div>
+    </div>
+
+
+  </form>
+
+
+    {% endblock %}
+  </div>
+
+
+
+  <div class="">
+
+
+    {%block datacontent%}
+    <div class="container" style="width: 100%;">
+
+      <div class="row" style="font-family: Verdana; margin: 0 auto; position: relative;">
+
+
+        <div class = "col col-md-12" style="max-width:100%;">
+          <div style="margin-left:20%;">
+            <button type="submit" class="btn btn-primary" id="lineChartButton">
+             <i class="fa fa-line-chart"></i>
+           </button>
+           <button type="submit" class="btn btn-primary" id="barChartButton" style="position:relative;">
+             <i class="fa fa-bar-chart"></i>
+           </button>
+           <button type="submit" class="btn btn-primary" id="scatterChartButton" style="position:relative;">
+             <i class="fa fa-sliders"></i>
+           </button>
+         </div>
+
+         <div class="col col-md-12 border" id = "chart_div" style= "padding:10px 10px 10px 10px; max-width:60%;margin-left:20%; border: solid;border-width: 2px; border-radius: 5px; margin-bottom: 30px; margin-right: 20%;">
+         </div>
+
+       </div>
+
+       <div class="row" style="margin-top: 50px; margin-bottom: 50px; max-width: 60%;margin-left: 20%;">
+       	<h3 style="font-style: sans-serif; font-smoothing: antialiased; margin-left: 30px;">Library Prep Failure Rate</h3>
+       	<table class=" table table-bordered display" id="failureData">
+          <thead style="background-color: #36454F; color: white;">
+            <tr>
+              <th>Year/Month</th>
+              <th>Failure Rate (%)</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          	{% for key, value in failure_rate_data.items()%}
+          	<tr>
+          		<td> {{key}}</td>
+              	<td>{{'%0.2f' % value}}</td>
+          	</tr>
+          	 {% endfor %}
+          </tbody>
+      </table>
+       </div>
+
+       <div class = "row" style="margin-top: 50px; margin-bottom: 50px; max-width: 70%;margin-left: 15%; border:solid; border-width: 1px; border-radius: 2px; ">
+       	<h3 style="font-style: sans-serif; font-smoothing: antialiased; margin-left: 30px;">Library Preparation Data By Sample</h3>
+         <table class=" table table-bordered display" id="libData">
+          <thead style="background-color: #36454F; color: white;">
+            <tr>
+              <th>Sample</th>
+              <th>Recipe</th>
+              <th>Preservation</th>
+              <th>Input (ng)</th>
+              <th>Library Yield (ng)</th>
+              <th>QC Status</th>
+              <th>Month</th>
+              <th>Year</th>
+            </tr>
+          </thead>
+
+
+          <tbody>
+            {% for key, value in data.items()%}
+
+            {%if 'libraryData' in value %}
+            {%for items in value['libraryData']%}
+            <tr>
+              <td>{{items['sample']}}</td>
+              <td>{{ items['recipe']}}</td>
+              <td> {{items['preservation']}}</td>
+              <td>{{'%0.2f' % items['input']}}</td>
+              <td>{{ '%0.2f' % items['libraryYield']}}</td>
+              <td>{{items['qcStatus']}}</td>
+              <td>{{items['month']}}</td>
+              <td>{{items['year']}}</td>
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+
+    </div>
+  </div>
+
+
+  {%endblock%}
+</div>
+
+
+<script type="text/javascript">
+
+  $(window).on('load', function() {
+    $(".content").hide();
+    $('#loading').fadeOut("slow");
+    $(".content").fadeIn("slow");
+  });
+
+  var inData= '{{data_to_chart | tojson | safe}}';
+  var toData= JSON.parse(inData);
+
+  google.charts.load('current', {'packages':['line','corechart', 'bar','scatter']});
+  google.charts.setOnLoadCallback(drawLineChart);
+  google.charts.setOnLoadCallback(drawBarChart);
+  google.charts.setOnLoadCallback(drawScatterChart);
+
+
+  function drawLineChart() {
+    var chartData = google.visualization.arrayToDataTable(toData);
+
+    var options = {
+      chart: {
+        title: 'Library Preparation Data',
+      },
+      bars: 'vertical',
+      vAxis: {format: 'decimal'},
+      height: 400,
+      colors: ['#1b9e77', '#d95f02', '#7570b3']
+    };
+
+    var chart = new google.charts.Line(document.getElementById("chart_div"));
+
+    chart.draw(chartData, options);
+
+  }
+
+  function drawBarChart() {
+    var chartData = google.visualization.arrayToDataTable(toData);
+
+    var options = {
+      chart: {
+        title: 'Library Preparation Data',
+      },
+      bars: 'vertical',
+      vAxis: {format: 'decimal'},
+      height: 400,
+      colors: ['#1b9e77', '#d95f02', '#7570b3']
+      
+    };
+
+    var chart = new google.charts.Bar(document.getElementById("chart_div"));
+
+    chart.draw(chartData, google.charts.Bar.convertOptions(options));
+
+  }
+
+  function drawScatterChart() {
+    var chartData = google.visualization.arrayToDataTable(toData);
+
+    var options = {
+      chart: {
+        title: 'Library Preparation Data',
+      },
+      bars: 'vertical',
+      vAxis: {format: 'decimal'},
+      height: 400,
+      colors: ['#1b9e77', '#d95f02', '#7570b3']
+    };
+
+    var chart = new google.charts.Scatter(document.getElementById("chart_div"));
+
+    chart.draw(chartData, google.charts.Scatter.convertOptions(options));
+
+  }
+
+
+  var scatterButton= document.getElementById("scatterChartButton");
+  scatterButton.onclick = function() {
+    drawScatterChart();
+  }
+
+
+  var barButton= document.getElementById("barChartButton");
+  barButton.onclick = function() {
+    drawBarChart();
+  }
+
+  var lineButton= document.getElementById("lineChartButton");
+  lineButton.onclick = function() {
+    drawLineChart();
+  }
+
+
+
+  $(document).ready(function(){
+    $('#libData').DataTable({
+      dom: 'Bflrtip',
+      "bSearchable":true,
+      "bPaginate": true,
+      "bFilter": true,
+      "iDisplayLength": 100,
+      "aLengthMenu": [[50, 100, 250, 5000, -1], [50, 100, 250, 500, "All"]],
+      buttons: [
+      'copyHtml5',
+      'excelHtml5',
+      'csvHtml5',
+      'pdfHtml5'
+      ]
+    });
+
+    $('#failureData').DataTable({
+      dom: 'Bflrtip',
+      "bSearchable":true,
+      "bPaginate": true,
+      "bFilter": true,
+      "iDisplayLength": 10,
+      "aLengthMenu": [[10, 20, 30, 40, -1], [10, 20, 30, 40, "All"]],
+      buttons: [
+      'copyHtml5',
+      'excelHtml5',
+      'csvHtml5',
+      'pdfHtml5'
+      ]
+    });
+  });
+
+
+  $('#startDate').datepicker({startView : 'year', format : 'mm/yyyy', enableYearToMonth: true, enableMonthToDay : false});
+  $('#endDate').datepicker({startView : 'year', format : 'mm/yyyy', enableYearToMonth: true, enableMonthToDay : false});
+
+
+  $(window).resize(function() {
+    if(this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function() {
+      $(this).trigger('resizeEnd');
+    }, 500);
+  });
+
+    //redraw graph when window resize is completed
+    $(window).on('resizeEnd', function() {
+      drawScatterChart();
+      drawBarChart();
+      drawLineChart();
+
+    });
+
+  </script>
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+

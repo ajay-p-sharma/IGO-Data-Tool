@@ -1,0 +1,124 @@
+{%extends "index.html"%}
+
+
+
+{% block datacontent%}
+<div class ="loadingLibData" id="loadingLibData" style="width:100%; height:100%; background:#2A2828; opacity:1.0;">
+  <img id=" jumbotron loading-image" src="static/images/loading.gif" alt="Loading..." style="margin-left:40%;margin-top:20%;width:20%; height:20%; background:black;opacity:1.0;"/>
+</div>
+<div class="container" style="width: 100%;">
+
+  <div class="row" style="font-family: Verdana; margin: 0 auto; position: relative;">
+
+
+    <div class = "col col-md-12" style="max-width:100%;">
+      <div style="margin-left:20%;">
+        <button type="submit" class="btn btn-primary" id="lineChartButton">
+         <i class="fa fa-line-chart"></i>
+       </button>
+       <button type="submit" class="btn btn-primary" id="barChartButton" style="position:relative;">
+         <i class="fa fa-bar-chart"></i>
+       </button>
+       <button type="submit" class="btn btn-primary" id="scatterChartButton" style="position:relative;">
+         <i class="fa fa-sliders"></i>
+       </button>
+     </div>
+
+     <div class="col col-md-12 border" id = "chart_div" style= "padding:10px 10px 10px 10px; max-width:60%;margin-left:20%; border: solid;border-width: 2px; border-radius: 5px; margin-bottom: 30px; margin-right: 20%;">
+         </div>
+
+   </div>
+
+   <div class="row" style="margin-top: 50px; margin-bottom: 50px; max-width: 60%;margin-left: 20%; ">
+    <h3 style="font-style: sans-serif; font-smoothing: antialiased; margin-left: 30px;"><b>Library Prep Failure Rate</b></h3>
+    <table class=" table table-bordered display" id="failureData">
+      <thead style="background-color: #36454F; color: white;">
+        <tr>
+          <th>Year/Month</th>
+          <th>Failure Rate (%)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for key, value in failure_rate_data.items()%}
+        <tr>
+          <td> {{key}}</td>
+          <td>{{'%0.2f' % value}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class = "row" style="padding-top: 5px; max-width: 70%;margin-left: 15%; border:solid; border-width: 1px; border-radius: 2px;">
+    <h3 style="font-style: sans-serif; font-smoothing: antialiased; margin-left: 30px;"><b>Library Preparation Data By Sample</b></h3>
+   <table class=" table table-bordered display" id="libData">
+    <thead style="background-color: #36454F; color: white;">
+      <tr>
+        <th>Sample</th>
+        <th>Recipe</th>
+        <th>Preservation</th>
+        <th>Input (ng)</th>
+        <th>Library Yield (ng)</th>
+        <th>QC Status</th>
+        <th>Month</th>
+        <th>Year</th>
+      </tr>
+    </thead>
+
+
+    <tbody>
+      {% for key, value in data.items()%}
+
+      {%if 'libraryData' in value %}
+      {%for items in value['libraryData']%}
+      <tr>
+        <td>{{items['sample']}}</td>
+        <td>{{ items['recipe']}}</td>
+        <td>{{ items['preservation']}}</td>
+        <td>{{'%0.2f' % items['input']}}</td>
+        <td>{{ '%0.2f' % items['libraryYield']}}</td>
+        <td>{{items['qcStatus']}}</td>
+        <td>{{items['month']}}</td>
+        <td>{{items['year']}}</td>
+      </tr>
+
+      {% endfor %}
+      {% endif %} 
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+</div>
+
+
+
+</div>
+</div>
+
+
+<script type="text/javascript">
+  $(window).on('load', function() {
+
+   $("#loadingLibData").fadeOut("slow");
+   $(".container").show();
+ });
+</script>
+
+
+
+
+{%endblock%}
+
+
+
+
+
+
+
+
+
+
+
+
