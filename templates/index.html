@@ -47,13 +47,12 @@
   {%endblock%}
 </nav>
 
-
 <div class="container content" style="width: 100%; ">
   {% block formcontent %}
 
   <h2 style="margin-left:40%; margin-bottom:40px;align-content: center;">Library preparation data</h2>
 
-  <form class="form-inline" action = "/upload_file" method = "POST" enctype = "multipart/form-data">
+  <form class="form-inline" action ="{{ url_for('upload_file') }}" method = "POST" enctype = "multipart/form-data">
 
     <div class = "col col-md-12" style="maximum-width:60%; margin-left:25%;align-content: center; ">
       <label for="startDate">Start Date:</label> <input placeholder="mm/yyyy" class="form-control" type="text" name="startDate" id="startDate" date-date-format="mm/yyyy"/>

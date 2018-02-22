@@ -1,16 +1,42 @@
 import os, sys, json, datetime
 from flask import Flask, render_template, request, redirect, flash, url_for
+from RevProxy import ReverseProxied
 from werkzeug.utils import secure_filename
-
-
+import requests
+import os, json, re, yaml
+from settings import APP_ROOT, APP_STATIC
 app = Flask(__name__)
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+import ssl
+import re
+import time
+import uwsgi, pickle
+from operator import itemgetter
+
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.wsgi_app = ReverseProxied(app.wsgi_app)
+
+
+class MyAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(num_pools=connections,
+                maxsize=maxsize,
+                block=block,
+                ssl_version=ssl.PROTOCOL_SSLv23)
+                #ssl_version=ssl.PROTOCOL_SSLv3)
+
+s = requests.Session()
+s.mount('https://', MyAdapter())
+
+
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 UPLOAD_FOLDER = 'Uploads/'
 recipeList = ["Agilent_MouseAllExonV1", "Agilent_v4_51MB_Human","AmpliconSeq","ChIPSeq","CHM","CRISPRSeq","CustomAmplificationPCR","CustomCapture",\
 "HemePACT_v3", "HemePACT_v3+", "HemePACT_v4", "IDT_Exome_V1_IMPACT468","IDTCustomCaptur", "IMPACT410", "IMPACT410+","IMPACT468","IWG","IWGCustomCapture",\
 "M-IMPACT_v1","NimblegenCustomCapture","R_Loop_DNA_Seq","RNASeq_PolyA","ShallowWGS","SMARTerAmpSeq","smRNASeq","WholeExomeSequencing","WholeGenomeBisulfateSequencing",\
 "WholeGenomeSequencing"]
-PATH_TO_STATS_FILE = "/Users/sharmaa1/Desktop/Ajay_Programs/FLASK_PROJECTS/flask/IGO-Data-Tool/LimsStats.tsv"
+PATH_TO_STATS_FILE = "LimsStats.tsv"
 
 @app.route('/')
 def hello_world():
@@ -38,7 +64,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/upload_file', methods=['POST', 'GET'])
+@app.route('/upload_file',  methods=['GET', 'POST'])
 def upload_file():
 
     startDate = request.form['startDate']
