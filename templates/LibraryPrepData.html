@@ -50,8 +50,9 @@
     </table>
   </div>
 
-  <div class = "row" style="padding-top: 5px; max-width: 70%;margin-left: 15%; border:solid; border-width: 1px; border-radius: 2px;">
+  <div class = "row" style="padding-top: 5px; max-width: 80%;margin-left: 10%; margin-right: 10%;">
     <h3 style="font-style: sans-serif; font-smoothing: antialiased; margin-left: 30px;"><b>Library Preparation Data By Sample</b></h3>
+   <div>
    <table class=" table table-bordered display" id="libData">
     <thead style="background-color: #36454F; color: white;">
       <tr>
@@ -90,6 +91,7 @@
     </tbody>
 
   </table>
+  </div>
 </div>
 
 
@@ -100,7 +102,7 @@
 
 <script type="text/javascript">
   $(window).on('load', function() {
-
+    $(".container").hide();
    $("#loadingLibData").fadeOut("slow");
    $(".container").show();
  });
